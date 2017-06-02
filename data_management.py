@@ -2,6 +2,7 @@ import sqlite3 as sq
 import pandas as pd
 import os
 from reporting import *
+import shutil
 
 mainPath   = r'C:\Users\ucqba01\Documents\Local Data\testing databases/'
 mergePath = r'\merged'
@@ -30,15 +31,52 @@ def getMemoryUsage(tableList,con)
     for t in tableList:
         dataUsage[t] = get(t,con).memory_usage().sum()
 
-#getMemoryUsage(tableUnique['common'],connections[0])
-
-
-def makeDataBase(path,filename)
+def makeDirectory(mainPath,mergePath):
     if not os.path.exists(mainPath+mergePath):
         os.makedirs(mainPath+mergePath)
-    conMerged = sq.connect(path+'/'+filename)
-    return conMerged
 
+def replaceString(myString, dict):
+    for k in dict.keys():
+        myString = myString.replace(k, dict[k])
+    return myString
+
+
+#getMemoryUsage(tableUnique['common'],connections[0])
 mergeCon = makeDataBase(mainPath+mergePath,'merged.db')
+
+makeDirectory(mainPath,mergePath)
+
+mergeDataBaseFile = '/merge3.db'
+
+shutil.copy(mainPath+'/'+databases[0],mainPath+mergePath+mergeDataBaseFile)
+
+scenarios = {}
+scenarioSettings = pd.DataFrame(columns=['scenario','identifier','value'])
+
+for db in databases:
+    scenarios[db] = replaceString(db,{'hR_m_2002_waves':'w','_newfuelcost.db':''})
+
+#this function is very user specific
+identifiersDict = {'waves'}
+
+con = sq.connect(mainPath+mergePath+mergeDataBaseFile)
+
+
+for t in tableUnique['specific']:
+    scen=scenarios[databases[0]]
+    colCursor = con.execute('select * from %s'%t)
+    cursor = con.cursor()
+    if 'scenario' not in [col[0] for col in colCursor.description]:
+        cursor.execute("ALTER TABLE %s ADD COLUMN scenario string;"%t)
+    cursor.execute("UPDATE %s SET scenario='%s'" %(t,scen))
+    cursor.execute("""CREATE TABLE 
+                        IF NOT EXISTS scenarios (
+                        scenario string NOT NULL,
+                        identifier string NOT NULL,
+                        value string NOT NULL
+                        );""")
+    scenarioSettings = dbFileSettings(databases[0])
+for id in scenarioSettings.keys():
+    cursor.execute("INSERT INTO scenarios (scenario,identifier,value) VALUES ('%s','%s','%s');"%(scen,id,scenarioSettings[id]))
 
 
