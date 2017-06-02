@@ -1,13 +1,13 @@
 from reporting import *
 
 path = r'C:\Users\ucqba01\Documents\Local Data\Round 6'
-
+GISpath = r'C:\Users\ucqba01\Google Drive\Extended Research\Scripts and Calculations\GIS\\'
 # get a list of the database files in the reporting directory. non-zero is a fail-safe measure
 allDatabases = [f for f in os.listdir(path) if '.db' in f and os.stat(path + '\\' + f).st_size > 0]
 
+doGeospatial = True
 # load shapefiles
 if doGeospatial and True:
-    GISpath = 'C:\\Users\\Andy\\Documents\\Masters\\Thesis\\highRES\\GIS\\'
     wgrid = gpd.read_file(GISpath + "wind_grid27700.shp")
     zones = gpd.read_file(GISpath + "zones_27700.shp")
     ukrez = gpd.read_file(GISpath + "ukrez.shp")
@@ -113,12 +113,20 @@ for db in reportOnDatabases:
     py.offline.plot(fig, filename=path + reportdir + 'generators.html', auto_open=False)
 
     graphs.append(py.offline.plot(fig, filename=path + reportdir + 'generators.html', output_type='div'))
-    ######################### windoffshore is aggregated at the moment - use parameter not variable
+
+    # note: windoffshore is aggregated at the moment - use parameter not variable
+
     # graphs.append(barplot(gen_cap,'gen','level','Generator Capacities (MW)',path+reportdir+'gen_capacities.html'))
     ### plot vre capacities
     # graphs.append(barplot(get('vre_cap_tot',con),'vre','value','vre Capacities (MW)',path+reportdir+'vre_capacities.html'))
     ### plot all generator generation hourly
     # graphs.append(seriesbarplot(clean(gen_sum_h,'value'),'h','value','gen','stack','Hourly Generation by Generator Type (MW)',path+reportdir+'generation_hourly.html'))
+
+
+    ### plot a bar chart of transmission capacity
+    graphs.append(seriesbarplot(transload(con), 'route', 'MW', 'trans', 'group', 'Transmission Capacity',
+                                path + reportdir + 'transmission_cap.html'))
+
 
     ### demand as a line graph on bar plot
     demand_h = convertToInt(get('demand', con), 'h').pivot_table(values='value', index='h', aggfunc='sum')
@@ -129,11 +137,6 @@ for db in reportOnDatabases:
 
     # graphs.append(seriesbarline(clean(gen_sum_h.append(dem),'value'),'h','value','gen','Demand','Generation with Demand',path+reportdir+'generation_hourly_demand.html'))
 
-    ### plot a bar chart of transmission capacity
-    graphs.append(seriesbarplot(transload(con), 'route', 'MW', 'trans', 'group', 'Transmission Capacity',
-                                path + reportdir + 'transmission_cap.html'))
-
-    #############
     ### plot a time series of storage generation and demand with zone as series
     # graphs.append(barplot(store_h,'h','value','Storage Demand(-) and Generation(+)',path+reportdir+'generation_storage.html'))
 
