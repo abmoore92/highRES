@@ -1,11 +1,10 @@
 from reporting import *
 
-path = 'C:\\Users\\Andy\\Documents\\Masters\\Thesis\\highRES\\2017 results\\Round 6'
+path = r'C:\Users\ucqba01\Documents\Local Data\Round 6'
 
-# get a list of the database files in the reporting directory. occasionally getting 0 size db
-# files created by some python function (not ideal). workaround to exclude them is to eplicitly set a size minimum in the list here
+# get a list of the database files in the reporting directory. non-zero is a fail-safe measure
 allDatabases = [f for f in os.listdir(path) if '.db' in f and os.stat(path + '\\' + f).st_size > 0]
-# databases = ['hR_m_2002_waves10000_RPS90_fcost100_small.db']
+
 # load shapefiles
 if doGeospatial and True:
     GISpath = 'C:\\Users\\Andy\\Documents\\Masters\\Thesis\\highRES\\GIS\\'
@@ -17,28 +16,32 @@ if doGeospatial and True:
     wgrid_rez.geometry = wgrid_rez_geom
     del wgrid_rez_geom
 
-overwriteReports = False  # overwrite or not. for time saving
+# overwrite or not. for time saving
+overwriteReports = False
 overwriteMaps = False
 
+#list of databases to write reports for
 reportOnDatabases = []
 for db in allDatabases:
     if overwriteReports or not os.path.exists(path + '\\' + db[:-3] + '.html'):
         print('will write for %s' % db)
         reportOnDatabases.append(db)
 
-# reportOnDatabases = ['hR_m_2002_waves400_RPS95_fcost80_newfuelcost.db']
-
 for db in reportOnDatabases:
     print('starting on %s' % db)
-    # db='highRES_2017_g_wavesON400_RPS95.db'
-    reportdir = '\\%s\\' % db[:-3]
+
     # create directory to put graphs in
+    reportdir = '\\%s\\' % db[:-3]
     if not os.path.exists(path + reportdir):
         os.makedirs(path + reportdir)
+
+    #establist database connection
     con = sq.connect(path + '\\' + db)
+
+    #list tables in database
     tables = getlist(con)
 
-    graphs = []  # graphs are saved as html into this list which is then printed to an html file
+    graphs = []  # graphs are saved as 'div' text into this list which is then printed to an html file
     images = []  # non-plotly graphs are saved as images and the locations stored in this list which are then added as links in the html file
     traces_pie = []  # tools.make_subplots(rows=1,cols=2,subplot_titles=['Annual Generation (MWh)','Capacity (MW)'])
 
@@ -260,4 +263,4 @@ for db in reportOnDatabases:
                     path + '\\' + db[:-3] + '.html')
 
     # close db connection
-    # con.close()
+    con.close()
