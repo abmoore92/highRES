@@ -19,3 +19,9 @@ def makedbName(dbgeneric,labelDict):
         dbstring = dbstring.replace(param,str(labelDict[param]))
     return dbstring
 	
+legNames = {'Solar':'Solar',
+            'Windonshore':'Onshore Wind',
+            'Windoffshore_Shallow':'Shallow Offshore',
+            'Windoffshore_Mid':'Mid Depth Offshore',
+            'Windoffshore_Floating':'Floating Offshore',
+            'NaturalgasOCGTnew':'Natural Gas OCGT'}
