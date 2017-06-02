@@ -18,10 +18,19 @@ def makedbName(dbgeneric,labelDict):
     for param in labelDict.keys():
         dbstring = dbstring.replace(param,str(labelDict[param]))
     return dbstring
-	
+
 legNames = {'Solar':'Solar',
             'Windonshore':'Onshore Wind',
             'Windoffshore_Shallow':'Shallow Offshore',
             'Windoffshore_Mid':'Mid Depth Offshore',
             'Windoffshore_Floating':'Floating Offshore',
             'NaturalgasOCGTnew':'Natural Gas OCGT'}
+
+# list of tables
+def getList(con):
+    cursor = con.cursor()
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+
+    tables = cursor.fetchall()
+    tables = [x[0] for x in tables]
+    return tables

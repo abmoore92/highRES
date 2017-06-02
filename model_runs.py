@@ -11,7 +11,6 @@ def sleep(seconds):
     time.sleep(seconds)
     print("slept for %s seconds" % seconds)
 
-
 # looks at the log file for the phrase "optimal solution found"
 def checkLog(log):
     i = False
