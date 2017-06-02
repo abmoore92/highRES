@@ -1,3 +1,5 @@
+doGeospatial = False
+
 from reporting import *
 
 path = r'C:\Users\ucqba01\Documents\Local Data\Round 6'
@@ -5,7 +7,6 @@ GISpath = r'C:\Users\ucqba01\Google Drive\Extended Research\Scripts and Calculat
 # get a list of the database files in the reporting directory. non-zero is a fail-safe measure
 allDatabases = [f for f in os.listdir(path) if '.db' in f and os.stat(path + '\\' + f).st_size > 0]
 
-doGeospatial = True
 # load shapefiles
 if doGeospatial and True:
     wgrid = gpd.read_file(GISpath + "wind_grid27700.shp")
@@ -151,7 +152,7 @@ for db in reportOnDatabases:
                                 ['Demand', 'Demand with Storage'], 'Generation with Demand and Storage',
                                 path + reportdir + 'generation__storage_hourly_demand2.html'))
     ### percentage fill plotted against capacity factor
-    vrecapr = vre_pct(get('vre_cap_r', con), get('vre_CF_r', con))
+    vrecapr = vre_pct(get('vre_cap_r', con), get('vre_CF_r', con),con)
 
     fig2 = tools.make_subplots(rows=2, cols=3, print_grid=False, subplot_titles=(vrecapr.vre.unique().tolist()))
     fig2['layout'].update(title='Installation Percentages against Available Cf. Bubble size by available area')

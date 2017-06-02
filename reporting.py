@@ -8,7 +8,10 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-import geopandas as gpd
+
+doGeospatial = False
+if doGeospatial:
+    import geopandas as gpd
 
 # import plotly.figure_factory as ff
 
@@ -238,7 +241,7 @@ def generationTimeFrameCount(store_h):
     count = []
     T = []
     for t in [1, 4, 12, 24, 48, 72, 168, 730]:
-        store_h['t'] = store.h // t
+        store_h['t'] = pd.to_numeric(store_h.h) // t
         s = store_h.pivot_table(values='value', aggfunc='mean', index='t')
         count.append(s[s > 0].count())
         T.append(t)
@@ -311,7 +314,7 @@ def read_dd(cols, file):
 
 # join necessary sources to create a dataframe with "percentage fill"
 # and capacity factor for each vre in each region
-def vre_pct(vre_cap_r, vreCF):
+def vre_pct(vre_cap_r, vreCF,con):
     areas = get('area', con)
     cap2area = get('cap2area', con)
     cap2area.rename(columns={'value': 'density'}, inplace=True)
