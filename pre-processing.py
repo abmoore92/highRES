@@ -74,7 +74,7 @@ write_dd3(areas_file,'offshore_areas_high.dd')
 def electrical(d):
     #loss is in percent. values taken from Negra et al
     ACnoncable = 0.741
-    data = pd.read_csv('electrical/electrical loss data (Negra).csv')
+    data = pd.read_csv('offshore wind/electrical/electrical loss data (Negra).csv')
     mins = data.pivot_table(values = 'Losses (%)',index='Distance /km',columns = 'Technology',aggfunc='min')
     if d < 50:
         loss = ACnoncable + d*(mins['HVAC'][50]-ACnoncable)/50
@@ -91,7 +91,7 @@ el = np.vectorize(electrical)
 # attribute table for wind grid is read and the electrical losses applied to the near_dist parameter
 # resultant output is a DataFrame
 def electricalgrid():
-    distgrid = pd.read_csv('electrical/distance_to_grid.txt')[['numpy','NEAR_DIST','lat','lon']]
+    distgrid = pd.read_csv('offshore wind/electrical/distance_to_grid.txt')[['numpy','NEAR_DIST','lat','lon']]
     distgrid['Electrical Loss Factor'] = el(distgrid['NEAR_DIST']/1000)
     return distgrid 
 
