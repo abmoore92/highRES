@@ -8,8 +8,6 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
-
-
 import geopandas as gpd
 
 # import plotly.figure_factory as ff
@@ -418,7 +416,7 @@ def getcurtail(con):  # must be wary of changes to model structure. how curtailm
 
 # geopandas is used to create spatial plots. choose the vre to be plotted, and the column to plot
 # the df has columns: r,vre,value
-def vreplot(df, vre, col, color, maximum, title, file):
+def vreplot(df, vre, col, color, maximum, zones, wgrid_rez,title, file):
     sns.reset_orig()
     fig, ax = plt.subplots()  # define figure
     df = df.loc[df[col] > 0.01]  # remove data with small values
