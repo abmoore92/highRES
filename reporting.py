@@ -9,9 +9,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 
-doGeospatial = False
-if doGeospatial:
-    import geopandas as gpd
+
+import geopandas as gpd
 
 # import plotly.figure_factory as ff
 
