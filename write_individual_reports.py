@@ -1,3 +1,9 @@
+import os
+import sys
+file_dir = os.getcwd()
+sys.path.append(file_dir)
+
+
 doGeospatial = False
 
 from reporting import *
