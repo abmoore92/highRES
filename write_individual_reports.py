@@ -4,20 +4,21 @@ file_dir = os.getcwd()
 sys.path.append(file_dir)
 
 
-doGeospatial = False
+doGeospatial = True
 
 from reporting import *
 
-path = r'C:\Users\ucqba01\Documents\Local Data\Round 6'
-GISpath = r'C:\Users\ucqba01\Google Drive\Extended Research\Scripts and Calculations\GIS\\'
+DATApath = r'C:\Users\ucqba01\Documents\Local Data\Round 6'
+GISpath = r'GIS'
+
 # get a list of the database files in the reporting directory. non-zero is a fail-safe measure
-allDatabases = [f for f in os.listdir(path) if '.db' in f and os.stat(path + '\\' + f).st_size > 0]
+allDatabases = [f for f in os.listdir(DATApath) if '.db' in f and os.stat(DATApath + '\\' + f).st_size > 0]
 
 # load shapefiles
-if doGeospatial and True:
-    wgrid = gpd.read_file(GISpath + "wind_grid27700.shp")
-    zones = gpd.read_file(GISpath + "zones_27700.shp")
-    ukrez = gpd.read_file(GISpath + "ukrez.shp")
+if doGeospatial:
+    wgrid = gpd.read_file(os.path.join(GISpath,"wind_grid27700.shp"))
+    zones = gpd.read_file(os.path.join(GISpath,"zones_27700.shp"))
+    ukrez = gpd.read_file(os.path.join(GISpath,"ukrez.shp"))
     wgrid_rez_geom = wgrid.geometry & ukrez.unary_union
     wgrid_rez = wgrid
     wgrid_rez.geometry = wgrid_rez_geom
@@ -30,7 +31,7 @@ overwriteMaps = False
 #list of databases to write reports for
 reportOnDatabases = []
 for db in allDatabases:
-    if overwriteReports or not os.path.exists(path + '\\' + db[:-3] + '.html'):
+    if overwriteReports or not os.path.exists(DATApath + '\\' + db[:-3] + '.html'):
         print('will write for %s' % db)
         reportOnDatabases.append(db)
 
@@ -39,11 +40,11 @@ for db in reportOnDatabases:
 
     # create directory to put graphs in
     reportdir = '\\%s\\' % db[:-3]
-    if not os.path.exists(path + reportdir):
-        os.makedirs(path + reportdir)
+    if not os.path.exists(DATApath + reportdir):
+        os.makedirs(DATApath + reportdir)
 
     #establist database connection
-    con = sq.connect(path + '\\' + db)
+    con = sq.connect(DATApath + '\\' + db)
 
     #list tables in database
     tables = getlist(con)
@@ -68,8 +69,8 @@ for db in reportOnDatabases:
 
     layout = go.Layout(height=500, title='Generation (left)             Capacity (right)        ')
     fig_pie = go.Figure(data=traces_pie, layout=layout)
-    graphs.append(py.offline.plot(fig_pie, filename=path + reportdir + 'pies.html', output_type='div'))
-    py.offline.plot(fig_pie, filename=path + reportdir + 'pies.html', auto_open=False)
+    graphs.append(py.offline.plot(fig_pie, filename=DATApath + reportdir + 'pies.html', output_type='div'))
+    py.offline.plot(fig_pie, filename=DATApath + reportdir + 'pies.html', auto_open=False)
     # py.offline.plot(fig_pie,filename='test.html')
 
     # get capacity factors for generators
@@ -117,9 +118,9 @@ for db in reportOnDatabases:
     fig.append_trace(bar_trace(storeGenActivity, 'time_period', 'generation_count'), 3, 2)
 
     fig['layout'].update(height=1500)
-    py.offline.plot(fig, filename=path + reportdir + 'generators.html', auto_open=False)
+    py.offline.plot(fig, filename=DATApath + reportdir + 'generators.html', auto_open=False)
 
-    graphs.append(py.offline.plot(fig, filename=path + reportdir + 'generators.html', output_type='div'))
+    graphs.append(py.offline.plot(fig, filename=DATApath + reportdir + 'generators.html', output_type='div'))
 
     # note: windoffshore is aggregated at the moment - use parameter not variable
 
@@ -132,7 +133,7 @@ for db in reportOnDatabases:
 
     ### plot a bar chart of transmission capacity
     graphs.append(seriesbarplot(transload(con), 'route', 'MW', 'trans', 'group', 'Transmission Capacity',
-                                path + reportdir + 'transmission_cap.html'))
+                                DATApath + reportdir + 'transmission_cap.html'))
 
 
     ### demand as a line graph on bar plot
@@ -156,7 +157,7 @@ for db in reportOnDatabases:
 
     graphs.append(seriesbarline(clean(gen_sum_h.append(dem).append(store_dem), 'value'), 'h', 'value', 'gen',
                                 ['Demand', 'Demand with Storage'], 'Generation with Demand and Storage',
-                                path + reportdir + 'generation__storage_hourly_demand2.html'))
+                                DATApath + reportdir + 'generation__storage_hourly_demand2.html'))
     ### percentage fill plotted against capacity factor
     vrecapr = vre_pct(get('vre_cap_r', con), get('vre_CF_r', con),con)
 
@@ -170,7 +171,7 @@ for db in reportOnDatabases:
         i = i + 1
     for yax in [l for l in fig2['layout'] if 'yaxis' in l]:
         fig2['layout'][yax].update(range=[0, 100])
-    graphs.append(py.offline.plot(fig2, filename=path + reportdir + 'pctareas_CF.html', output_type='div'))
+    graphs.append(py.offline.plot(fig2, filename=DATApath + reportdir + 'pctareas_CF.html', output_type='div'))
 
     ### percentage fill plotted against lcoe
     vrecapr = pd.merge(vrecapr,
@@ -192,10 +193,10 @@ for db in reportOnDatabases:
 
     graphs.append(
         plotSupplyCurves(vrecapr[vrecapr.value > 0.01], 'actual_generation_TWh', 'potential_lcoe(£/MWh)', 'vre',
-                         'Resultant Supply Curves', path + reportdir + 'resultant_supply.html'))
+                         'Resultant Supply Curves', DATApath + reportdir + 'resultant_supply.html'))
     graphs.append(
         plotSupplyCurves(vrecapr, 'potential_generation_TWh', 'potential_lcoe(£/MWh)', 'vre', 'Input Supply Curves',
-                         path + reportdir + 'potential_supply.html'))
+                         DATApath + reportdir + 'potential_supply.html'))
 
     graphs.append(vreRegionalCapacityLcoePlot(vrecapr, 'Installed VRE by LCOE'))
 
@@ -210,7 +211,7 @@ for db in reportOnDatabases:
     for yax in [l for l in fig3['layout'] if 'yaxis' in l]:
         fig3['layout'][yax].update(range=[0, 100])
 
-    graphs.append(py.offline.plot(fig3, filename=path + reportdir + 'pctareas_potential_LCOE.html', output_type='div'))
+    graphs.append(py.offline.plot(fig3, filename=DATApath + reportdir + 'pctareas_potential_LCOE.html', output_type='div'))
 
     fig4 = tools.make_subplots(rows=2, cols=3, print_grid=False, subplot_titles=(vrecapr.vre.unique().tolist()))
     fig4['layout'].update(title='Installation Percentages against Resultant LCOE. Bubble size by available area')
@@ -223,10 +224,10 @@ for db in reportOnDatabases:
     for yax in [l for l in fig4['layout'] if 'yaxis' in l]:
         fig4['layout'][yax].update(range=[0, 100])
 
-    graphs.append(py.offline.plot(fig4, filename=path + reportdir + 'pctareas_potential_LCOE.html', output_type='div'))
+    graphs.append(py.offline.plot(fig4, filename=DATApath + reportdir + 'pctareas_potential_LCOE.html', output_type='div'))
 
     # Correlation
-    if not os.path.exists(path + reportdir + 'vreCorrelation.png'):
+    if not os.path.exists(DATApath + reportdir + 'vreCorrelation.png'):
         vreGenAfterCurtail = get('var_vre_gen_sum_h', con).pivot(columns='vre', values='value', index='h')
         vregenCorr = vreGenAfterCurtail.corr()
         corrAx = plt.axes()
@@ -234,9 +235,9 @@ for db in reportOnDatabases:
         corrAx.set_title('National VRE Generation Correlation (on hourly time series)')
         corrAx.set_xlabel('')
         corrAx.set_ylabel('')
-        correlationPlot.figure.savefig(path + reportdir + 'vreCorrelation.png')
+        correlationPlot.figure.savefig(DATApath + reportdir + 'vreCorrelation.png')
         plt.close()
-    images.append(path + reportdir + 'vreCorrelation.png')
+    images.append(DATApath + reportdir + 'vreCorrelation.png')
 
     '''
     vreCFRaw = get('vre_gen',con)
@@ -256,7 +257,7 @@ for db in reportOnDatabases:
         vre_cap_r = get('vre_cap_r', con)
 
         for vre in vre_cap_r.vre.unique():
-            mapfile = path + reportdir + vre + '.png'
+            mapfile = DATApath + reportdir + vre + '.png'
             if overwriteMaps or not os.path.exists(
                     mapfile):  # checks to see if the map already exists or if overwrite is set to True
                 print('writing map')
@@ -270,7 +271,7 @@ for db in reportOnDatabases:
 
     ### write graphs into a single html report with lcoe appended to the title
     html = mkreport(graphs, image_html(images), db[:-3] + ' - sys-lcoe £%s /MWh' % lcoe,
-                    path + '\\' + db[:-3] + '.html')
+                    DATApath + '\\' + db[:-3] + '.html')
 
     # close db connection
     con.close()
