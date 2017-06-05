@@ -3,7 +3,6 @@ import sys
 file_dir = os.getcwd()
 sys.path.append(file_dir)
 
-
 doGeospatial = True
 
 from reporting import *
@@ -13,8 +12,10 @@ GISpath = r'GIS'
 
 # get a list of the database files in the reporting directory. non-zero is a fail-safe measure
 allDatabases = [f for f in os.listdir(DATApath) if '.db' in f and os.stat(DATApath + '\\' + f).st_size > 0]
-
+print('databases:',allDatabases)
 # load shapefiles
+
+doGeospatial = True
 if doGeospatial:
     wgrid = gpd.read_file(os.path.join(GISpath,"wind_grid27700.shp"))
     zones = gpd.read_file(os.path.join(GISpath,"zones_27700.shp"))
@@ -29,11 +30,12 @@ overwriteReports = False
 overwriteMaps = False
 
 #list of databases to write reports for
-reportOnDatabases = []
+reportOnDatabases = ['hR_m_2002_waves400_RPS20_fcost80_newfuelcost.db']
 for db in allDatabases:
     if overwriteReports or not os.path.exists(DATApath + '\\' + db[:-3] + '.html'):
-        print('will write for %s' % db)
         reportOnDatabases.append(db)
+
+print('reporting on:',reportOnDatabases)
 
 for db in reportOnDatabases:
     print('starting on %s' % db)
@@ -51,23 +53,27 @@ for db in reportOnDatabases:
 
     graphs = []  # graphs are saved as 'div' text into this list which is then printed to an html file
     images = []  # non-plotly graphs are saved as images and the locations stored in this list which are then added as links in the html file
+
+    # Generation and Capacity Pie Charts
     traces_pie = []  # tools.make_subplots(rows=1,cols=2,subplot_titles=['Annual Generation (MWh)','Capacity (MW)'])
 
     # generation held in two separate tables
     gen_sum_h = mergeGEN('var_vre_gen_sum_h', 'var_non_vre_gen_sum_h', con)
+    print(gen_sum_h.head())
     gen_sum = gen_sum_h.pivot_table(values='value', index='gen', aggfunc='sum')
-
+    print(gen_sum.head())
     # generator capacities held in same table
     gen_cap = get('vre_cap_tot', con).rename(columns={'vre': 'gen', 'value': 'level'}).append(
         get('var_non_vre_cap', con).rename(columns={'non_vre': 'gen'}))
 
-    traces_pie.append(pie_trace(gen_sum.index, gen_sum.values.round(0), {'x': [0.0, 0.45], 'y': [0.0,
-                                                                                                 1.0]}))  # ,'Total Generation (MWh)',path+reportdir+'generation_pie.html'))
+    traces_pie.append(pie_trace(gen_sum.index, gen_sum.value.round(0),
+                               {'x': [0.0, 0.45], 'y': [0.0,1.0]}))
+    print('gen_sum.index',gen_sum.index)
+    print('gen_sum.values.round(0)',gen_sum.values.round(0))
     traces_pie.append(pie_trace(gen_cap[gen_cap['gen'] != 'pgen'].sort_values(by='gen').gen,
                                 gen_cap[gen_cap['gen'] != 'pgen'].sort_values(by='gen').level.round(0),
                                 {'x': [0.55, 1.0], 'y': [0.0, 1.0]}))
-
-    layout = go.Layout(height=500, title='Generation (left)             Capacity (right)        ')
+    layout = go.Layout(height=500, title='Generation (left) and Capacity (right)')
     fig_pie = go.Figure(data=traces_pie, layout=layout)
     graphs.append(py.offline.plot(fig_pie, filename=DATApath + reportdir + 'pies.html', output_type='div'))
     py.offline.plot(fig_pie, filename=DATApath + reportdir + 'pies.html', auto_open=False)
@@ -262,7 +268,7 @@ for db in reportOnDatabases:
                     mapfile):  # checks to see if the map already exists or if overwrite is set to True
                 print('writing map')
                 images.append(
-                    vreplot(vre_cap_r, vre, 'value', colour, vre_cap_r[vre_cap_r.vre == vre].value.max(), vre, mapfile))
+                    vreplot(vre_cap_r, vre, 'value', colour, vre_cap_r[vre_cap_r.vre == vre].value.max(), zones, wgrid_rez, vre, mapfile))
             else:
                 images.append(mapfile)
                 print('map already exists')
