@@ -93,13 +93,9 @@ for db in reportOnDatabases:
     # get capacity factors for generators and storage
     gen_cap.index = gen_cap['gen']
     CF = gen_cap
-    print(CF)
     CF = CF[['gen','level']]
-    print(CF)
     CF['generation'] = gen_sto_sum.set_index('gen')
-    print(CF)
     CF['CF'] = CF['generation'] / (8760 * CF['level'])
-    print(CF)
 
     # aggregate storage generation & demand to hourly national resolution
     store = mergestore(con)
