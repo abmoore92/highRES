@@ -45,7 +45,7 @@ for db in reportOnDatabases:
     if not os.path.exists(DATApath + reportdir):
         os.makedirs(DATApath + reportdir)
 
-    #establist database connection
+    #establish database connection
     con = sq.connect(DATApath + '\\' + db)
 
     #list tables in database
@@ -59,17 +59,13 @@ for db in reportOnDatabases:
 
     # generation held in two separate tables
     gen_sum_h = mergeGEN('var_vre_gen_sum_h', 'var_non_vre_gen_sum_h', con)
-    print(gen_sum_h.head())
     gen_sum = gen_sum_h.pivot_table(values='value', index='gen', aggfunc='sum')
-    print(gen_sum.head())
     # generator capacities held in same table
     gen_cap = get('vre_cap_tot', con).rename(columns={'vre': 'gen', 'value': 'level'}).append(
         get('var_non_vre_cap', con).rename(columns={'non_vre': 'gen'}))
 
     traces_pie.append(pie_trace(gen_sum.index, gen_sum.value.round(0),
                                {'x': [0.0, 0.45], 'y': [0.0,1.0]}))
-    print('gen_sum.index',gen_sum.index)
-    print('gen_sum.values.round(0)',gen_sum.values.round(0))
     traces_pie.append(pie_trace(gen_cap[gen_cap['gen'] != 'pgen'].sort_values(by='gen').gen,
                                 gen_cap[gen_cap['gen'] != 'pgen'].sort_values(by='gen').level.round(0),
                                 {'x': [0.55, 1.0], 'y': [0.0, 1.0]}))
@@ -79,11 +75,7 @@ for db in reportOnDatabases:
     py.offline.plot(fig_pie, filename=DATApath + reportdir + 'pies.html', auto_open=False)
     # py.offline.plot(fig_pie,filename='test.html')
 
-    # get capacity factors for generators
-    CF = gen_cap
-    gen_cap.index = gen_cap['gen']
-    CF['generation'] = gen_sum
-    CF['CF'] = CF['generation'] / (8760 * CF['level'])
+
 
     # get storage capacity from separate storage variable
     store_cap = get('var_store_gen_cap', con)
@@ -97,6 +89,17 @@ for db in reportOnDatabases:
     # get storage generation values
     store_gen_sum = get('store_gen_tot', con).rename(columns={'s': 'gen'})
     gen_sto_sum = gen_sum.reset_index().append(store_gen_sum)
+
+    # get capacity factors for generators and storage
+    gen_cap.index = gen_cap['gen']
+    CF = gen_cap
+    print(CF)
+    CF = CF[['gen','level']]
+    print(CF)
+    CF['generation'] = gen_sto_sum.set_index('gen')
+    print(CF)
+    CF['CF'] = CF['generation'] / (8760 * CF['level'])
+    print(CF)
 
     # aggregate storage generation & demand to hourly national resolution
     store = mergestore(con)
