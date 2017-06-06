@@ -44,7 +44,7 @@ def clean(df, col):
 
 
 # return list of tables in database whose names contain a specific string
-def look(string):
+def look(con,string):
     tables = getlist(con)
     return [t for t in tables if string in t]
 
