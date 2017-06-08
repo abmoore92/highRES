@@ -419,7 +419,7 @@ def getcurtail(con):  # must be wary of changes to model structure. how curtailm
 def vreplot(df, vre, col, color, maximum, zones, wgrid_rez,title, file):
     sns.reset_orig()
     fig, ax = plt.subplots()  # define figure
-    df = df.loc[df[col] > 0.01]  # remove data with small values
+    df = df.loc[df[col] > 1]  # remove data with small values
     ax.axis('equal')
     zones.plot(ax=ax, color='white', linewidth=0.1)  # plot demand zones
     wgrid_rez.plot(ax=ax, color='white', linewidth=0.1)  # plot wind grid within renewable energy zone
@@ -744,7 +744,7 @@ def plotComparisonHeatmaps(df, waves, RPS, fcost, plotValue, mainpath, filetype=
 
 
 def getSupplyCurves(thisfcost, allfcosts, connection):  # CF here are do not include wave losses
-    vrecapr = vre_pct(get('vre_cap_r', connection), get('vre_CF_r', connection))
+    vrecapr = vre_pct(get('vre_cap_r', connection), get('vre_CF_r', connection),connection)
     vrecapr = pd.merge(vrecapr, get('capex_vre_r', connection).rename(
         columns={'value': 'total_capex'}))  # add total capex column
     vrecapr['series'] = vrecapr['vre']

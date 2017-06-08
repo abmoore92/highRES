@@ -26,11 +26,11 @@ if doGeospatial:
     del wgrid_rez_geom
 
 # overwrite or not. for time saving
-overwriteReports = True
-overwriteMaps = False
+overwriteReports = False
+overwriteMaps = True
 
 #list of databases to write reports for
-reportOnDatabases = []#'hR_m_2002_waves400_RPS20_fcost80_newfuelcost.db']
+reportOnDatabases = ['hR_m_2002_waves10000_RPS90_fcost105_newfuelcost.db','hR_m_2002_waves10000_RPS90_fcost140_newfuelcost.db']#'hR_m_2002_waves400_RPS20_fcost80_newfuelcost.db']
 for db in allDatabases:
     if overwriteReports or not os.path.exists(DATApath + '\\' + db[:-3] + '.html'):
         reportOnDatabases.append(db)
