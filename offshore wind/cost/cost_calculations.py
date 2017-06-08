@@ -10,8 +10,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import stats
 
-path=r'C:\Users\Andy\Google Drive\Extended Research\Scripts and Calculations\new cost analysis'
-
+path = os.path.dirname(os.path.realpath(__file__))
 file = path+r'\cost_data.csv'
 costs_raw = pd.read_csv(file)
 costs = costs_raw[costs_raw.turbines>=10]
