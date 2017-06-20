@@ -554,7 +554,7 @@ def plotComparisonCorrelationHeatmaps(waves, mypath, dbstring,title):
     if not os.path.exists(mypath + reportdir):
         os.makedirs(mypath + reportdir)
     filelocation = mypath + reportdir + 'correlations.png'
-    f.savefig(filelocation, dpi=600)
+    f.savefig(filelocation, dpi=900)
     plt.close(f)
     return filelocation
 
