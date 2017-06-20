@@ -521,9 +521,9 @@ def qualitycontrol(con, directory, overwrite):
             # %%
 
 
-def plotComparisonCorrelationHeatmaps(waves, mypath, dbstring):
+def plotComparisonCorrelationHeatmaps(waves, mypath, dbstring,title):
     f, axarr = plt.subplots(4, 6)
-    f.suptitle('VRE Generation Correlation for wave setting %s' % waves)
+    f.suptitle(title)
     RPS = [20, 40, 60, 80, 90, 95]
     fcost = [80, 100, 120, 140]
     fcost.reverse()
@@ -559,7 +559,7 @@ def plotComparisonCorrelationHeatmaps(waves, mypath, dbstring):
     return filelocation
 
 
-# plotComparisonCorrelationHeatmaps(10000,path,'hR_m_2002_waves(waves)_RPS(rps)_fcost(fcost)_newfuelcost.db')
+# plotComparisonCorrelationHeatmaps(10000,path,'hR_m_2002_waves(waves)_RPS(rps)_fcost(fcost)_newfuelcost.db','VRE Generation National Correlation - no wave losses')
 # %%
 def plotComparisonCapacities(waves, mypath, dbstring, file):
     f, axarr = plt.subplots(4, 6)
