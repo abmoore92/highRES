@@ -539,7 +539,7 @@ def plotComparisonCorrelationHeatmaps(waves, mypath, dbstring,title):
                                                'Windoffshore_Mid': 'WM',
                                                'Windoffshore_Floating': 'WF'}, inplace=True)
             vregenCorr = vreGenAfterCurtail.corr()
-            sns.heatmap(vregenCorr.round(2), cbar=False, annot=True, annot_kws={'size': 4},
+            sns.heatmap(vregenCorr.round(2), cbar=False, annot=True, annot_kws={'size': 5},
                         ax=axarr[fcost.index(fc), RPS.index(rps)], vmin=-1, vmax=1)
             axarr[fcost.index(fc), RPS.index(rps)].set_xlabel('')
             axarr[fcost.index(fc), RPS.index(rps)].set_ylabel('')
