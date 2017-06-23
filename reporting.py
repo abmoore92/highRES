@@ -521,11 +521,11 @@ def qualitycontrol(con, directory, overwrite):
             # %%
 
 
-def plotComparisonCorrelationHeatmaps(waves, mypath, dbstring,title):
-    f, axarr = plt.subplots(4, 6)
+def plotComparisonCorrelationHeatmaps(waves, mypath, RPS, fcost, dbstring,title):
+    f, axarr = plt.subplots(len(fcost), len(RPS))
     f.suptitle(title)
-    RPS = [20, 40, 60, 80, 90, 95]
-    fcost = [80, 100, 120, 140]
+    #RPS = [20, 40, 60, 80, 90, 95]
+    #fcost = [80, 100, 120, 140]
     fcost.reverse()
     reportdir = '\\compare\\'
     for rps in RPS:
@@ -558,15 +558,17 @@ def plotComparisonCorrelationHeatmaps(waves, mypath, dbstring,title):
     plt.close(f)
     return filelocation
 
-
-# plotComparisonCorrelationHeatmaps(10000,path, [80, 100, 120, 140],[20, 40, 60, 80, 90, 95],'hR_m_2002_waves(waves)_RPS(rps)_fcost(fcost)_newfuelcost.db','VRE Generation National Correlation - no wave losses')
-def plotComparisonCapacities(waves, mypath, fcostList, RPSList, dbstring, file):
+# plotComparisonCorrelationHeatmaps(10000,path,'hR_m_2002_waves(waves)_RPS(rps)_fcost(fcost)_newfuelcost.db','VRE Generation National Correlation - no wave losses')
+# %%
+def plotComparisonCapacities(waves, mypath, dbstring, file):
     f, axarr = plt.subplots(4, 6)
     f.suptitle('VRE Capacity for wave setting %s' % waves)
+    RPS = [20, 40, 60, 80, 90, 95]
+    fcost = [80, 100, 120, 140]
     fcost.reverse()
     reportdir = '\\compare\\'
-    for rps in RPSList:
-        for fc in fcostList:
+    for rps in RPS:
+        for fc in fcost:
             mydbstring = dbstring.replace('(waves)', str(waves)).replace('(rps)', str(rps)).replace('(fcost)', str(fc))
             connection = sq.connect(mypath + '\\' + mydbstring)
             vrecap = get('vre_cap', connection)
