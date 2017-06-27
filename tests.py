@@ -14,9 +14,11 @@ class TestReporting(unittest.TestCase):
     def setUp(self):
         pass
 
-    def testClean_lessthan(self):
-        df = pd.DataFrame(data=np.arange(10**7) / 10**6, columns=['r'])
-        self.assertLess(clean(df,'r')['r'].sum(),df['r'].sum())
+    #checks that the column in the clean dataframe has more zeros. this will fail if the cutoff is made too small in the clean function
+    def testClean_moreZeros(self):
+        df = pd.DataFrame(data=np.arange(10 ** 7) / 10 ** 6, columns=['r'])
+        df_clean = clean(df,'r')
+        self.assertTrue(df.loc[df['r']==0]['r'].count() < df_clean.loc[df_clean['r']==0]['r'].count() )
 
     # check that the function does not change the input dataframe
     def testClean_originalUnchanged(self):
