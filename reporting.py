@@ -36,9 +36,9 @@ def convertToInt(df, col):
     return df
 
 
-#  reduce small numbers to zero
+#  reduce small numbers to zero. leaves original dataframe unchanged
 def clean(df, col):
-    df2 = df
+    df2 = df.copy()
     df2[col][df2[col] < 0.001] = 0
     return df2
 
