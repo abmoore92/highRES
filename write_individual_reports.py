@@ -30,7 +30,7 @@ overwriteReports = False
 overwriteMaps = True
 
 #list of databases to write reports for
-reportOnDatabases = ['hR_m_2002_waves10000_RPS90_fcost105_newfuelcost.db','hR_m_2002_waves10000_RPS90_fcost140_newfuelcost.db']#'hR_m_2002_waves400_RPS20_fcost80_newfuelcost.db']
+reportOnDatabases = ['hR_m_2002_waves10000_RPS90_fcost105_newfuelcost.db','hR_m_2002_waves10000_RPS90_fcost140_newfuelcost.db']
 for db in allDatabases:
     if overwriteReports or not os.path.exists(DATApath + '\\' + db[:-3] + '.html'):
         reportOnDatabases.append(db)
@@ -244,16 +244,6 @@ for db in reportOnDatabases:
         plt.close()
     images.append(DATApath + reportdir + 'vreCorrelation.png')
 
-    '''
-    vreCFRaw = get('vre_gen',con)
-    vre_cap_r = get('vre_cap_r',con)
-    vre_cap_r = vre_cap_r[vre_cap_r.value>0.01]
-    vreGenBeforeCurtail_r =pd.merge(vreCFRaw.rename(columns={'value':'CF'}),vre_cap_r.rename(columns={'value':'capacity'}),on=['vre','r'])
-    vreGenBeforeCurtail_r['generation']=vreGenBeforeCurtail_r['CF']*vreGenBeforeCurtail_r['capacity']
-    vreGenBeforeCurtail = dropto(['vre','h'],vreGenBeforeCurtail_r[['vre','h','r','generation']])
-    vreGenBeforeCurtail = vreGenBeforeCurtail.pivot(columns='vre',index='h',values='generation')
-    sns.heatmap(vreGenBeforeCurtail)
-    '''
     ### Geospatial reporting. Using geopandas to produce images which are then read by the html file
     if doGeospatial:
         capmax = get('vre_cap_r', con).pivot(values='value', columns='vre', index='r').max()
