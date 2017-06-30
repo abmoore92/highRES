@@ -60,7 +60,7 @@ Some variables need to be set to use the script
 | Variable      | Type         | Definition |
 | ------------- | ------------- | ---------|
 | doGeospatial|switch| whether you want to do maps (using geopandas) |
-| DATAApath  | directory| The folder containing the sqlite databases |
+| DATApath  | directory| The folder containing the sqlite databases |
 | GISpath | directory | The folder containing GIS files|
 | overwriteReports | switch | whether to overwrite the html files if they already exist |
 | overwriteMaps | switch | whether to overwrite map images if they exist |
