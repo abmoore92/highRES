@@ -50,8 +50,10 @@ def lookuptable():
     zr_lookup = zones_regions[['wind_grid27700.numpy','zones_27700.Name_1']]
     zr_lookup.columns=['numpy','zone']    
     return zr_lookup
-    
+
+# write labels on the shapefile data so that the output has the right labels for gams
 difdict = {-3:'Windoffshore_Floating',-2:'Windoffshore_Mid',-1:'Windoffshore_Shallow'}
+
 area_high = gpd.read_file('GIS\\areas\\areas_high_0_20_70.shp')
 areas_out = categorise(area_high,'area','RESULT',difdict)
 print (areas_out.duplicated(['RESULT','numpy']).sum())
